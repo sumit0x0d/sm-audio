@@ -1,1 +1,1 @@
-# Data Structures (libsm-x)
+# Audio Capture (libsm-x)
