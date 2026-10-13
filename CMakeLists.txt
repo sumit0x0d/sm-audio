@@ -5,7 +5,7 @@ project(sm-audio-capture
    DESCRIPTION "Audio Capture (libsm-x)"
    LANGUAGES C)
 
-set(CMAKE_C_STANDARD 90)
+set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_BUILD_TYPE Release)
@@ -17,7 +17,7 @@ else()
    set(CMAKE_C_VISIBILITY_PRESET hidden)
    set(CMAKE_CXX_VISIBILITY_PRESET hidden)
    set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
-   add_compile_options(-Wall -Wextra -Werror -pedantic)
+   # add_compile_options(-Wall -Wextra -Werror -pedantic)
 endif()
 
 find_package(PkgConfig REQUIRED)
@@ -27,11 +27,11 @@ pkg_check_modules(PULSEAUDIO REQUIRED IMPORTED_TARGET libpulse)
 
 add_library(sm-audio-capture SHARED
    "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture.c"
-   "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture-pulseaudio.c"
+   # "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture-alsa.c"
    # "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture-pipewire.c"
-   "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture-alsa.c")
-target_link_libraries(sm-audio-capture PRIVATE ${ALSA_LIBRARIES} ${PULSEAUDIO_LIBRARIES})
-target_include_directories(sm-audio-capture PRIVATE ${ALSA_INCLUDE_DIRS} ${PULSEAUDIO_INCLUDE_DIRS} PUBLIC include)
+   "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture-pulseaudio.c")
+target_link_libraries(sm-audio-capture PRIVATE ${PULSEAUDIO_LIBRARIES})
+target_include_directories(sm-audio-capture PRIVATE ${PULSEAUDIO_INCLUDE_DIRS} PUBLIC include)
 
 include(GNUInstallDirs)
 

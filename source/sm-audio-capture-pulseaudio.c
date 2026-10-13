@@ -2,10 +2,8 @@
 
 #include "sm-audio-capture-pulseaudio.h"
 
-typedef struct SM_Audio_Capture_Create_Info CreateConfig;
-
-static void _pulseaudio_create(const CreateConfig *create_info, void *backend);
-static void _pulseaudio_destroy(void *backend);
+static SM_Audio_Capture_Backend _pulseaudio_create(const SM_Audio_Capture_Create_Info *create_info);
+static void _pulseaudio_destroy(SM_Audio_Capture_Backend backend);
 
 SM_Audio_Capture_Interface audio_capture_interface_pulseaudio = {
    .create = _pulseaudio_create,
@@ -17,10 +15,9 @@ static void _pa_stream_request_cb(pa_stream *pstream, size_t nbytes, void *userd
 static void _pa_stream_notify_cb(pa_stream *pstream, void *userdata);
 static void _pa_stream_event_cb(pa_stream *pstream, const char *name, pa_proplist *pproplist, void *userdata);
 
-static void _pulseaudio_create(const CreateConfig *create_info, void *backend)
+static SM_Audio_Capture_Backend _pulseaudio_create(const SM_Audio_Capture_Create_Info *create_info)
 {
-   SM_Audio_Capture_Pulseaudio *pulseaudio = (SM_Audio_Capture_Pulseaudio *)backend;
-   pulseaudio = (SM_Audio_Capture_Pulseaudio *)malloc(sizeof (SM_Audio_Capture_Pulseaudio));
+   SM_Audio_Capture_Pulseaudio *pulseaudio = (SM_Audio_Capture_Pulseaudio *)malloc(sizeof (SM_Audio_Capture_Pulseaudio));
    pa_error_code_t result = PA_OK;
    pulseaudio->pa_mainloop = pa_mainloop_new();
    pa_mainloop_api *pa_mainloop_api = pa_mainloop_get_api(pulseaudio->pa_mainloop);
@@ -44,9 +41,10 @@ static void _pulseaudio_create(const CreateConfig *create_info, void *backend)
    pa_mainloop_run(pulseaudio->pa_mainloop, NULL);
    pa_context_unref(pulseaudio->pa_context);
    pa_mainloop_free(pulseaudio->pa_mainloop);
+   return (SM_Audio_Capture_Backend)pulseaudio;
 }
 
-static void _pulseaudio_destroy(void *backend)
+static void _pulseaudio_destroy(SM_Audio_Capture_Backend backend)
 {
    SM_Audio_Capture_Pulseaudio *pulseaudio = (SM_Audio_Capture_Pulseaudio *)backend;
    free(pulseaudio);

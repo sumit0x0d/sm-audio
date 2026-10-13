@@ -22,9 +22,14 @@ SM_Audio_Capture *sm_audio_capture_create(const SM_Audio_Capture_Create_Info *cr
    case SM_AUDIO_CAPTURE_BACKEND_TYPE_PIPEWIRE:
       // audio_capture->interface = audio_capture_interface_pipewire;
       break;
+   case SM_AUDIO_CAPTURE_BACKEND_TYPE_ALSA:
+      // audio_capture->interface = audio_capture_interface_alsa;
+      break;
    }
 
-   audio_capture->interface.create(create_info, audio_capture->backend);
+   audio_capture->backend = audio_capture->interface.create(create_info);
+
+   return audio_capture;
 }
 
 void sm_audio_capture_destroy(SM_Audio_Capture *audio_capture)
