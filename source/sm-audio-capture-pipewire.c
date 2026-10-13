@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "audio-capture-pipewire.h"
+#include "sm-audio-capture-pipewire.h"
 
 typedef struct audio_capture_pipewire _pipewire_t;
 typedef struct audio_capture_interface _interface_t;
@@ -12,8 +12,8 @@ static void _pipewire_create(const _create_config_t *create_config, void *backen
 static void _pipewire_destroy(void *backend);
 
 struct audio_capture_interface audio_capture_interface_pipewire = {
-	.create = _pipewire_create,
-	.destroy = _pipewire_destroy
+   .create = _pipewire_create,
+   .destroy = _pipewire_destroy
 };
 
 extern const struct pw_core_events pw_core_events;
@@ -23,62 +23,62 @@ static void _pipewire_core_done(void *object, uint32_t id, int seq);
 
 static void _pipewire_create(const _create_config_t *create_config, void *backend)
 {
-	_pipewire_t *pipewire = (_pipewire_t *)backend;
-	pipewire = (_pipewire_t *)malloc(sizeof (_pipewire_t));
-	assert(pipewire);
-	pw_init(NULL, NULL);
-	pipewire->main_loop = pw_main_loop_new(NULL);
-	struct pw_loop *pw_loop = pw_main_loop_get_loop(pipewire->main_loop);
-	pipewire->context = pw_context_new(pw_loop, NULL, 0);
-	pipewire->core = pw_context_connect(pipewire->context, NULL, 0);
-	pipewire->registry = pw_core_get_registry(pipewire->core, PW_VERSION_REGISTRY, 0);
-	// pw_registry_add_listener(pipewire->registry, &pipewire->registry_listener, &registry_events, NULL);
-	// static struct pw_core_events core_events = {
-	// 	PW_VERSION_CORE_EVENTS,
-	// 	.done = _pipewire_core_done
-	// };
-    	// pw_core_add_listener(pipewire->core, &pipewire->core_listener, &core_events, pipewire);
-	// pw_stream_add_listener(pipewire->stream, &pipewire->stream_listener, &pw_stream_events, pipewire);
-	// pipewire->seq = pw_core_sync(pipewire->core, PW_ID_CORE, 0);
-	struct pw_properties *pw_properties = pw_properties_new(PW_KEY_MEDIA_TYPE, "Audio",
-		PW_KEY_CONFIG_NAME, "client-rt.conf",
-		PW_KEY_MEDIA_CATEGORY, "Capture",
-		PW_KEY_MEDIA_ROLE, "Music",
-		NULL);
-	pipewire->stream = pw_stream_new(pipewire->core, "audio-capture", pw_properties);
+   _pipewire_t *pipewire = (_pipewire_t *)backend;
+   pipewire = (_pipewire_t *)malloc(sizeof (_pipewire_t));
+   assert(pipewire);
+   pw_init(NULL, NULL);
+   pipewire->main_loop = pw_main_loop_new(NULL);
+   struct pw_loop *pw_loop = pw_main_loop_get_loop(pipewire->main_loop);
+   pipewire->context = pw_context_new(pw_loop, NULL, 0);
+   pipewire->core = pw_context_connect(pipewire->context, NULL, 0);
+   pipewire->registry = pw_core_get_registry(pipewire->core, PW_VERSION_REGISTRY, 0);
+   // pw_registry_add_listener(pipewire->registry, &pipewire->registry_listener, &registry_events, NULL);
+   // static struct pw_core_events core_events = {
+   //    PW_VERSION_CORE_EVENTS,
+   //    .done = _pipewire_core_done
+   // };
+       // pw_core_add_listener(pipewire->core, &pipewire->core_listener, &core_events, pipewire);
+   // pw_stream_add_listener(pipewire->stream, &pipewire->stream_listener, &pw_stream_events, pipewire);
+   // pipewire->seq = pw_core_sync(pipewire->core, PW_ID_CORE, 0);
+   struct pw_properties *pw_properties = pw_properties_new(PW_KEY_MEDIA_TYPE, "Audio",
+      PW_KEY_CONFIG_NAME, "client-rt.conf",
+      PW_KEY_MEDIA_CATEGORY, "Capture",
+      PW_KEY_MEDIA_ROLE, "Music",
+      NULL);
+   pipewire->stream = pw_stream_new(pipewire->core, "audio-capture", pw_properties);
         const struct spa_pod *spa_pod[1];
-	uint8_t buffer[1024];
+   uint8_t buffer[1024];
         struct spa_pod_builder spa_pod_builder = {
-		.data = buffer,
-		.size = sizeof (buffer),
-		._padding = 0,
-		.state = {},
-		.callbacks = {}
-	};
-	struct spa_audio_info_raw spa_audio_info_raw = {
-		.format = SPA_AUDIO_FORMAT_F32,
-		.flags = 0,
-		.rate = 0,
-		.channels = 0,
-		.position = 0
-	};
-	spa_pod[0] = spa_format_audio_raw_build(&spa_pod_builder, SPA_PARAM_EnumFormat, &spa_audio_info_raw);
-	pw_stream_connect(pipewire->stream, PW_DIRECTION_INPUT, PW_ID_ANY,
-		PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS | PW_STREAM_FLAG_RT_PROCESS, spa_pod, 1);
-	pw_main_loop_run(pipewire->main_loop);
+      .data = buffer,
+      .size = sizeof (buffer),
+      ._padding = 0,
+      .state = {},
+      .callbacks = {}
+   };
+   struct spa_audio_info_raw spa_audio_info_raw = {
+      .format = SPA_AUDIO_FORMAT_F32,
+      .flags = 0,
+      .rate = 0,
+      .channels = 0,
+      .position = 0
+   };
+   spa_pod[0] = spa_format_audio_raw_build(&spa_pod_builder, SPA_PARAM_EnumFormat, &spa_audio_info_raw);
+   pw_stream_connect(pipewire->stream, PW_DIRECTION_INPUT, PW_ID_ANY,
+      PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS | PW_STREAM_FLAG_RT_PROCESS, spa_pod, 1);
+   pw_main_loop_run(pipewire->main_loop);
 }
 
 static void _pipewire_destroy(void *backend)
 {
-	_pipewire_t *pipewire = (_pipewire_t *)backend;
-	// pw_registry_destroy(pipewire->registry);
-	// pw_proxy_destroy((struct pw_proxy *)pipewire->registry);
-	spa_hook_remove(&pipewire->core_listener);
-	pw_core_disconnect(pipewire->core);
-	spa_hook_remove(&pipewire->registry_listener);
-	pw_context_destroy(pipewire->context);
-	pw_main_loop_destroy(pipewire->main_loop);	
-	free(pipewire);
+   _pipewire_t *pipewire = (_pipewire_t *)backend;
+   // pw_registry_destroy(pipewire->registry);
+   // pw_proxy_destroy((struct pw_proxy *)pipewire->registry);
+   spa_hook_remove(&pipewire->core_listener);
+   pw_core_disconnect(pipewire->core);
+   spa_hook_remove(&pipewire->registry_listener);
+   pw_context_destroy(pipewire->context);
+   pw_main_loop_destroy(pipewire->main_loop);   
+   free(pipewire);
 }
 
 static void destroy(void *data)
@@ -181,27 +181,27 @@ trigger_done(void *data)
 {}
 
 const struct pw_stream_events pw_stream_events = {
-	PW_VERSION_STREAM_EVENTS,
-	.destroy = destroy,
-	.state_changed = state_changed,
-	.control_info = control_info,
-	.io_changed = io_changed,
-	// .param_changed = param_changed,
-	.add_buffer = add_buffer,
-	.remove_buffer = remove_buffer,
-	// .process = process,
-	.drained = drained,
-	.command = command,
-	.trigger_done = trigger_done
+   PW_VERSION_STREAM_EVENTS,
+   .destroy = destroy,
+   .state_changed = state_changed,
+   .control_info = control_info,
+   .io_changed = io_changed,
+   // .param_changed = param_changed,
+   .add_buffer = add_buffer,
+   .remove_buffer = remove_buffer,
+   // .process = process,
+   .drained = drained,
+   .command = command,
+   .trigger_done = trigger_done
 };
 
 
 static void
 _pipewire_core_done(void *object, uint32_t id, int seq)
 {
-	_pipewire_t *pipewire = (_pipewire_t *)object;
+   _pipewire_t *pipewire = (_pipewire_t *)object;
 
-	if (id == PW_ID_CORE && seq == pipewire->seq) {
-		pw_main_loop_quit(pipewire->main_loop);
-	}
+   if (id == PW_ID_CORE && seq == pipewire->seq) {
+      pw_main_loop_quit(pipewire->main_loop);
+   }
 }
