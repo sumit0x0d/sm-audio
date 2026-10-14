@@ -5,9 +5,11 @@
 
 #include <alsa/asoundlib.h>
 
-struct SM_Audio_Capture_ALSA {
-};
+typedef struct  {
+} SM_Audio_Capture_ALSA;
 
-extern struct SM_Audio_Capture_Interface audio_capture_interface_alsa;
+
+SM_Audio_Capture_ALSA *sm_audio_capture_alsa_create(const SM_Audio_Capture_Create_Info *create_info);
+void sm_audio_capture_alsa_destroy(SM_Audio_Capture_ALSA *this);
 
 #endif

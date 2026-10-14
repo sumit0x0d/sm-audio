@@ -4,8 +4,8 @@
 #include <sm-api.h>
 #include <sm-typedef.h>
 
-typedef void * SM_Audio_Capture_Backend;
 typedef struct SM_Audio_Capture SM_Audio_Capture;
+typedef union SM_Audio_Capture_Backend SM_Audio_Capture_Backend;
 
 typedef enum {
    SM_AUDIO_CAPTURE_BACKEND_TYPE_ALSA,
@@ -19,12 +19,7 @@ typedef struct {
    SM_Unsigned_32 sample_rate;
 } SM_Audio_Capture_Create_Info;
 
-typedef struct {
-   SM_Audio_Capture_Backend (*create)(const SM_Audio_Capture_Create_Info *create_info);
-   void (*destroy)(SM_Audio_Capture_Backend backend);
-} SM_Audio_Capture_Interface;
-
 SM_API SM_Audio_Capture *sm_audio_capture_create(const SM_Audio_Capture_Create_Info *create_info);
-SM_API void sm_audio_capture_destroy(SM_Audio_Capture *audio_capture);
+SM_API void sm_audio_capture_destroy(SM_Audio_Capture *this);
 
 #endif

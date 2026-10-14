@@ -2,22 +2,14 @@
 
 #include "sm-audio-capture-pulseaudio.h"
 
-static SM_Audio_Capture_Backend _pulseaudio_create(const SM_Audio_Capture_Create_Info *create_info);
-static void _pulseaudio_destroy(SM_Audio_Capture_Backend backend);
-
-SM_Audio_Capture_Interface audio_capture_interface_pulseaudio = {
-   .create = _pulseaudio_create,
-   .destroy = _pulseaudio_destroy
-};
-
 static void _pa_stream_success_cb(pa_stream *pstream, int success, void *userdata);
 static void _pa_stream_request_cb(pa_stream *pstream, size_t nbytes, void *userdata);
 static void _pa_stream_notify_cb(pa_stream *pstream, void *userdata);
 static void _pa_stream_event_cb(pa_stream *pstream, const char *name, pa_proplist *pproplist, void *userdata);
 
-static SM_Audio_Capture_Backend _pulseaudio_create(const SM_Audio_Capture_Create_Info *create_info)
+static SM_Audio_Capture_PulseAudio *sm_audio_capture_pulseaudio_create(const SM_Audio_Capture_Create_Info *create_info)
 {
-   SM_Audio_Capture_Pulseaudio *pulseaudio = (SM_Audio_Capture_Pulseaudio *)malloc(sizeof (SM_Audio_Capture_Pulseaudio));
+   SM_Audio_Capture_PulseAudio *pulseaudio = (SM_Audio_Capture_PulseAudio *)malloc(sizeof (SM_Audio_Capture_PulseAudio));
    pa_error_code_t result = PA_OK;
    pulseaudio->pa_mainloop = pa_mainloop_new();
    pa_mainloop_api *pa_mainloop_api = pa_mainloop_get_api(pulseaudio->pa_mainloop);
@@ -41,18 +33,17 @@ static SM_Audio_Capture_Backend _pulseaudio_create(const SM_Audio_Capture_Create
    pa_mainloop_run(pulseaudio->pa_mainloop, NULL);
    pa_context_unref(pulseaudio->pa_context);
    pa_mainloop_free(pulseaudio->pa_mainloop);
-   return (SM_Audio_Capture_Backend)pulseaudio;
+   return pulseaudio;
 }
 
-static void _pulseaudio_destroy(SM_Audio_Capture_Backend backend)
+static void sm_audio_capture_pulseaudio_destroy(SM_Audio_Capture_PulseAudio *this)
 {
-   SM_Audio_Capture_Pulseaudio *pulseaudio = (SM_Audio_Capture_Pulseaudio *)backend;
-   free(pulseaudio);
+   free(this);
 }
 
 static void _pa_stream_success_cb(pa_stream *s, int success, void *userdata)
 {
-   SM_Audio_Capture_Pulseaudio *p = userdata;
+   SM_Audio_Capture_PulseAudio *p = userdata;
    if (success < 0) {
       fprintf(stderr, "Stream connection failed: %s\n", pa_strerror(success));
       // pa_mainloop_quit(p, 1);
@@ -63,7 +54,7 @@ static void _pa_stream_success_cb(pa_stream *s, int success, void *userdata)
 
 static void _pa_stream_request_cb(pa_stream *p, size_t nbytes, void *userdata)
 {
-   SM_Audio_Capture_Pulseaudio *pulseaudio = (SM_Audio_Capture_Pulseaudio *)userdata;
+   SM_Audio_Capture_PulseAudio *pulseaudio = (SM_Audio_Capture_PulseAudio *)userdata;
    uint8_t buf[1024];
    pa_stream_peek(pulseaudio->pa_stream, (const void**)&buf, &nbytes);
    // Process the captured audio data as needed
@@ -75,7 +66,7 @@ static void _pa_stream_request_cb(pa_stream *p, size_t nbytes, void *userdata)
 
 static void _pa_stream_notify_cb(pa_stream *p, void *userdata)
 {
-   SM_Audio_Capture_Pulseaudio *pulseaudio = (SM_Audio_Capture_Pulseaudio *)userdata;
+   SM_Audio_Capture_PulseAudio *pulseaudio = (SM_Audio_Capture_PulseAudio *)userdata;
    pa_stream_state_t pa_stream_state = pa_stream_get_state(pulseaudio->pa_stream);
    switch (pa_stream_state) {
    case PA_STREAM_CREATING:

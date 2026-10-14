@@ -9,8 +9,9 @@ typedef struct {
    pa_mainloop *pa_mainloop;
    pa_context *pa_context;
    pa_stream *pa_stream;
-} SM_Audio_Capture_Pulseaudio;
+} SM_Audio_Capture_PulseAudio;
 
-extern SM_Audio_Capture_Interface audio_capture_interface_pulseaudio;
+SM_Audio_Capture_PulseAudio *sm_audio_capture_pulseaudio_create(const SM_Audio_Capture_Create_Info *create_info);
+void sm_audio_capture_pulseaudio_destroy(SM_Audio_Capture_PulseAudio *this);
 
 #endif

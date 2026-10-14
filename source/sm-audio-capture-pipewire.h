@@ -8,7 +8,7 @@
 
 #include <sm-audio-capture.h>
 
-struct SM_Audio_Capture_PipeWire {
+typedef struct {
    int seq;
    unsigned move:1;
    struct pw_main_loop *main_loop;
@@ -20,8 +20,9 @@ struct SM_Audio_Capture_PipeWire {
    struct pw_stream *stream;
    struct spa_hook stream_listener;
    struct spa_audio_info format;
-};
+} SM_Audio_Capture_PipeWire;
 
-extern struct SM_Audio_Capture_Interface audio_capture_interface_pipewire;
+SM_Audio_Capture_PipeWire *sm_audio_capture_pipewire_create(const SM_Audio_Capture_Create_Info *create_info);
+void sm_audio_capture_pipewire_destroy(SM_Audio_Capture_PipeWire *this);
 
 #endif
