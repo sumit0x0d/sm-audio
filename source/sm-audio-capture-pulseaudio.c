@@ -7,7 +7,7 @@ static void _pa_stream_request_cb(pa_stream *pstream, size_t nbytes, void *userd
 static void _pa_stream_notify_cb(pa_stream *pstream, void *userdata);
 static void _pa_stream_event_cb(pa_stream *pstream, const char *name, pa_proplist *pproplist, void *userdata);
 
-static SM_Audio_Capture_PulseAudio *sm_audio_capture_pulseaudio_create(const SM_Audio_Capture_Create_Info *create_info)
+SM_Audio_Capture_PulseAudio *sm_audio_capture_pulseaudio_create(const SM_Audio_Capture_Create_Info *create_info)
 {
    SM_Audio_Capture_PulseAudio *pulseaudio = (SM_Audio_Capture_PulseAudio *)malloc(sizeof (SM_Audio_Capture_PulseAudio));
    pa_error_code_t result = PA_OK;
@@ -36,7 +36,7 @@ static SM_Audio_Capture_PulseAudio *sm_audio_capture_pulseaudio_create(const SM_
    return pulseaudio;
 }
 
-static void sm_audio_capture_pulseaudio_destroy(SM_Audio_Capture_PulseAudio *this)
+void sm_audio_capture_pulseaudio_destroy(SM_Audio_Capture_PulseAudio *this)
 {
    free(this);
 }

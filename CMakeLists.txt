@@ -5,7 +5,7 @@ project(sm-audio-capture
    DESCRIPTION "Audio Capture (libsm-x)"
    LANGUAGES C)
 
-set(CMAKE_C_STANDARD 90)
+set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_BUILD_TYPE Release)
@@ -35,8 +35,7 @@ target_include_directories(sm-audio-capture PRIVATE ${PULSEAUDIO_INCLUDE_DIRS} P
 
 include(GNUInstallDirs)
 
-install(TARGETS
-   sm-audio-capture
+install(TARGETS sm-audio-capture
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
@@ -46,7 +45,8 @@ install(DIRECTORY include/
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
    enable_testing()
 
-   add_executable(sm-audio-capture-test test/sm-audio-capture-test.c)
-   add_test(NAME sm-audio-capture COMMAND sm-audio-capture-test)
-   target_link_libraries(sm-audio-capture-test PUBLIC sm-audio-capture)
+   add_executable(test-sm-audio-capture test/test-sm-audio-capture.c)
+   target_link_libraries(test-sm-audio-capture PUBLIC sm-audio-capture)
+   add_executable(benchmark-sm-audio-capture benchmark/benchmark-sm-audio-capture.c)
+   target_link_libraries(benchmark-sm-audio-capture PRIVATE sm-audio-capture)
 endif()

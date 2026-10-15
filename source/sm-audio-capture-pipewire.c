@@ -4,24 +4,12 @@
 
 #include "sm-audio-capture-pipewire.h"
 
-typedef struct audio_capture_pipewire _pipewire_t;
-typedef struct audio_capture_interface _interface_t;
-typedef struct audio_capture_create_config _create_config_t;
-
-static void _pipewire_create(const _create_config_t *create_config, void *backend);
-static void _pipewire_destroy(void *backend);
-
-struct audio_capture_interface audio_capture_interface_pipewire = {
-   .create = _pipewire_create,
-   .destroy = _pipewire_destroy
-};
-
-extern const struct pw_core_events pw_core_events;
-extern const struct pw_stream_events pw_stream_events;
+const struct pw_core_events pw_core_events;
+const struct pw_stream_events pw_stream_events;
 
 static void _pipewire_core_done(void *object, uint32_t id, int seq);
 
-static void _pipewire_create(const _create_config_t *create_config, void *backend)
+static void sm_audio_capture_pipewire_create(const _create_config_t *create_config, void *backend)
 {
    _pipewire_t *pipewire = (_pipewire_t *)backend;
    pipewire = (_pipewire_t *)malloc(sizeof (_pipewire_t));
@@ -68,7 +56,7 @@ static void _pipewire_create(const _create_config_t *create_config, void *backen
    pw_main_loop_run(pipewire->main_loop);
 }
 
-static void _pipewire_destroy(void *backend)
+static void sm_audio_capture_pipewire_destroy(void *backend)
 {
    _pipewire_t *pipewire = (_pipewire_t *)backend;
    // pw_registry_destroy(pipewire->registry);
