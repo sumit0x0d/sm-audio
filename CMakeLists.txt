@@ -47,6 +47,4 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
    add_executable(test-sm-audio-capture test/test-sm-audio-capture.c)
    target_link_libraries(test-sm-audio-capture PUBLIC sm-audio-capture)
-   add_executable(benchmark-sm-audio-capture benchmark/benchmark-sm-audio-capture.c)
-   target_link_libraries(benchmark-sm-audio-capture PRIVATE sm-audio-capture)
 endif()
