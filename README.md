@@ -1,1 +1,1 @@
-# Audio Capture (libsm-x)
+# SM Audio (libsm-x)
