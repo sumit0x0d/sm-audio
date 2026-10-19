@@ -27,9 +27,9 @@ pkg_check_modules(PULSEAUDIO REQUIRED IMPORTED_TARGET libpulse)
 
 add_library(sm-audio-capture SHARED
    "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture.c"
-   # "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture-alsa.c"
-   # "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture-pipewire.c"
-   "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture-pulseaudio.c")
+   # "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture-backend-alsa.c"
+   # "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture-backend-pipewire.c"
+   "${CMAKE_CURRENT_SOURCE_DIR}/source/sm-audio-capture-backend-pulseaudio.c")
 target_link_libraries(sm-audio-capture PRIVATE ${PULSEAUDIO_LIBRARIES})
 target_include_directories(sm-audio-capture PRIVATE ${PULSEAUDIO_INCLUDE_DIRS} PUBLIC include)
 

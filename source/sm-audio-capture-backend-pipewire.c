@@ -2,14 +2,14 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "sm-audio-capture-pipewire.h"
+#include "sm-audio-capture-backend-pipewire.h"
 
 const struct pw_core_events pw_core_events;
 const struct pw_stream_events pw_stream_events;
 
 static void _pipewire_core_done(void *object, uint32_t id, int seq);
 
-static void sm_audio_capture_pipewire_create(const _create_config_t *create_config, void *backend)
+static void sm_audio_capture_backend_pipewire_create(const _create_config_t *create_config, void *backend)
 {
    _pipewire_t *pipewire = (_pipewire_t *)backend;
    pipewire = (_pipewire_t *)malloc(sizeof (_pipewire_t));
@@ -56,7 +56,7 @@ static void sm_audio_capture_pipewire_create(const _create_config_t *create_conf
    pw_main_loop_run(pipewire->main_loop);
 }
 
-static void sm_audio_capture_pipewire_destroy(void *backend)
+static void sm_audio_capture_backend_pipewire_destroy(void *backend)
 {
    _pipewire_t *pipewire = (_pipewire_t *)backend;
    // pw_registry_destroy(pipewire->registry);
@@ -86,25 +86,24 @@ static void io_changed(void *data, uint32_t id, void *area, uint32_t size)
 }
 
 static void param_changed(void *data, uint32_t id, const struct spa_pod *param)
-{
-        _pipewire_t *pipewire = data;
+{_pipewire_t *pipewire = data;
  
-        /* NULL means to clear the format */
-        if (param == NULL || id != SPA_PARAM_Format)
-                return;
- 
-        if (spa_format_parse(param, &pipewire->format.media_type, &pipewire->format.media_subtype) < 0)
-                return;
- 
-        /* only accept raw audio */
-        if (pipewire->format.media_type != SPA_MEDIA_TYPE_audio ||
-            pipewire->format.media_subtype != SPA_MEDIA_SUBTYPE_raw)
-                return;
- 
-        /* call a helper function to parse the format for us. */
-        spa_format_audio_raw_parse(param, &pipewire->format.info.raw);
- 
-        fprintf(stdout, "capturing rate:%d channels:%d\n", pipewire->format.info.raw.rate, pipewire->format.info.raw.channels);
+   /* NULL means to clear the format */
+   if (param == NULL || id != SPA_PARAM_Format)
+            return;
+
+   if (spa_format_parse(param, &pipewire->format.media_type, &pipewire->format.media_subtype) < 0)
+            return;
+
+   /* only accept raw audio */
+   if (pipewire->format.media_type != SPA_MEDIA_TYPE_audio ||
+      pipewire->format.media_subtype != SPA_MEDIA_SUBTYPE_raw)
+            return;
+
+   /* call a helper function to parse the format for us. */
+   spa_format_audio_raw_parse(param, &pipewire->format.info.raw);
+
+   fprintf(stdout, "capturing rate:%d channels:%d\n", pipewire->format.info.raw.rate, pipewire->format.info.raw.channels);
 }
 
 static void
@@ -118,42 +117,42 @@ remove_buffer(void *data, struct pw_buffer *buffer)
 static void
 process(void *data)
 {
-        _pipewire_t *pipewire = data;
-        struct pw_buffer *b;
-        struct spa_buffer *buf;
-        float *samples, max;
-        uint32_t c, n, n_channels, n_samples, peak;
+   _pipewire_t *pipewire = data;
+   struct pw_buffer *b;
+   struct spa_buffer *buf;
+   float *samples, max;
+   uint32_t c, n, n_channels, n_samples, peak;
+
+   if ((b = pw_stream_dequeue_buffer(pipewire->stream)) == NULL) {
+            pw_log_warn("out of buffers: %m");
+            return;
+   }
+
+   buf = b->buffer;
+   if ((samples = buf->datas[0].data) == NULL)
+            return;
+
+   n_channels = pipewire->format.info.raw.channels;
+   n_samples = buf->datas[0].chunk->size / sizeof(float);
+
+   /* move cursor up */
+   if (pipewire->move)
+            fprintf(stdout, "%c[%dA", 0x1b, n_channels + 1);
+   fprintf(stdout, "captured %d samples\n", n_samples / n_channels);
+   for (c = 0; c < pipewire->format.info.raw.channels; c++) {
+            max = 0.0f;
+            for (n = c; n < n_samples; n += n_channels)
+                  max = fmaxf(max, fabsf(samples[n]));
+
+            peak = SPA_CLAMP(max * 30, 0, 39);
+
+            fprintf(stdout, "channel %d: |%*s%*s| peak:%f\n",
+                           c, peak+1, "*", 40 - peak, "", max);
+   }
+   pipewire->move = true;
+   fflush(stdout);
  
-        if ((b = pw_stream_dequeue_buffer(pipewire->stream)) == NULL) {
-                pw_log_warn("out of buffers: %m");
-                return;
-        }
- 
-        buf = b->buffer;
-        if ((samples = buf->datas[0].data) == NULL)
-                return;
- 
-        n_channels = pipewire->format.info.raw.channels;
-        n_samples = buf->datas[0].chunk->size / sizeof(float);
- 
-        /* move cursor up */
-        if (pipewire->move)
-                fprintf(stdout, "%c[%dA", 0x1b, n_channels + 1);
-        fprintf(stdout, "captured %d samples\n", n_samples / n_channels);
-        for (c = 0; c < pipewire->format.info.raw.channels; c++) {
-                max = 0.0f;
-                for (n = c; n < n_samples; n += n_channels)
-                        max = fmaxf(max, fabsf(samples[n]));
- 
-                peak = SPA_CLAMP(max * 30, 0, 39);
- 
-                fprintf(stdout, "channel %d: |%*s%*s| peak:%f\n",
-                                c, peak+1, "*", 40 - peak, "", max);
-        }
-        pipewire->move = true;
-        fflush(stdout);
- 
-        pw_stream_queue_buffer(pipewire->stream, b);
+   pw_stream_queue_buffer(pipewire->stream, b);
 }
 
 static void

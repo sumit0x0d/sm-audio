@@ -1,5 +1,5 @@
-#ifndef SM_AUDIO_CAPTURE_PIPEWIRE_H
-#define SM_AUDIO_CAPTURE_PIPEWIRE_H
+#ifndef SM_AUDIO_CAPTURE_BACKEND_PIPEWIRE_H
+#define SM_AUDIO_CAPTURE_BACKEND_PIPEWIRE_H
 
 #include <math.h>
 
@@ -20,9 +20,9 @@ typedef struct {
    struct pw_stream *stream;
    struct spa_hook stream_listener;
    struct spa_audio_info format;
-} SM_Audio_Capture_PipeWire;
+} SM_Audio_Capture_Backend_PipeWire;
 
-SM_Audio_Capture_PipeWire *sm_audio_capture_pipewire_create(const SM_Audio_Capture_Create_Info *create_info);
-void sm_audio_capture_pipewire_destroy(SM_Audio_Capture_PipeWire *this);
+SM_Audio_Capture_Backend_PipeWire *sm_audio_capture_backend_pipewire_create(const SM_Audio_Capture_Create_Info *create_info);
+void sm_audio_capture_backend_pipewire_destroy(SM_Audio_Capture_Backend_PipeWire *this);
 
 #endif
