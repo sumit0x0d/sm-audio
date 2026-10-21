@@ -3,7 +3,7 @@
 int main()
 {
    SM_Audio_Capture_Create_Info create_info = {
-      .backend_type = SM_AUDIO_CAPTURE_BACKEND_TYPE_PULSEAUDIO,
+      .backend_type = SM_AUDIO_CAPTURE_BACKEND_API_PULSEAUDIO,
       .sample_rate = 44100,
       .channel_count = 2
    };

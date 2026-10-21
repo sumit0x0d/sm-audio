@@ -38,7 +38,7 @@ _pipewire_create(const _create_info_t *create_info, void *backend)
        // pw_core_add_listener(pipewire->core, &pipewire->core_listener, &core_events, pipewire);
    // pw_stream_add_listener(pipewire->stream, &pipewire->stream_listener, &pw_stream_events, pipewire);
    // pipewire->seq = pw_core_sync(pipewire->core, PW_ID_CORE, 0);
-   struct pw_properties *pw_properties = pw_properties_new(PW_KEY_MEDIA_TYPE, "Audio", PW_KEY_CONFIG_NAME, "client-rt.conf",
+   struct pw_properties *pw_properties = pw_properties_new(PW_KEY_MEDIA_API, "Audio", PW_KEY_CONFIG_NAME, "client-rt.conf",
         PW_KEY_MEDIA_CATEGORY, "Capture", PW_KEY_MEDIA_ROLE, "Music", NULL);
    pipewire->stream = pw_stream_new(pipewire->core, "audio-playback", pw_properties);
 
@@ -58,7 +58,7 @@ _pipewire_create(const _create_info_t *create_info, void *backend)
       .channels = 0,
       .position = 0
    };
-   spa_pod[0] = spa_format_audio_raw_build(&spa_pod_builder, SPA_PARAM_EnumFormat, &spa_audio_info_raw);
+   spa_pod[0] = spa_format_audio_raw_build(&spa_pod_builder, SPA_PARAM_APIFormat, &spa_audio_info_raw);
    pw_stream_connect(pipewire->stream, PW_DIRECTION_INPUT, PW_ID_ANY,
       PW_STREAM_FLAG_AUTOCONNECT | PW_STREAM_FLAG_MAP_BUFFERS | PW_STREAM_FLAG_RT_PROCESS, spa_pod, 1);
    pw_main_loop_run(pipewire->main_loop);
@@ -111,8 +111,8 @@ param_changed(void *data, uint32_t id, const struct spa_pod *param)
                 return;
  
         /* only accept raw audio */
-        if (pipewire->format.media_type != SPA_MEDIA_TYPE_audio ||
-            pipewire->format.media_subtype != SPA_MEDIA_SUBTYPE_raw)
+        if (pipewire->format.media_type != SPA_MEDIA_API_audio ||
+            pipewire->format.media_subtype != SPA_MEDIA_SUBAPI_raw)
                 return;
  
         /* call a helper function to parse the format for us. */

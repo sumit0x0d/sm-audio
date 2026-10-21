@@ -11,7 +11,7 @@ union SM_Audio_Playback_Backend {
 };
 
 struct SM_Audio_Playback {
-   SM_Audio_Playback_Backend_Type backend_type;
+   SM_Audio_Playback_Backend_API backend_type;
    SM_Audio_Playback_Backend backend;
 };
 
@@ -23,10 +23,10 @@ SM_Audio_Playback *sm_audio_playback_create(const SM_Audio_Playback_Create_Info 
    }
 
    switch (create_info->backend_type) {
-   case SM_AUDIO_PLAYBACK_BACKEND_TYPE_PULSEAUDIO:
+   case SM_AUDIO_PLAYBACK_BACKEND_API_PULSEAUDIO:
       this->backend.pulseaudio = sm_audio_playback_backend_pulseaudio_create(create_info);
       break;
-   case SM_AUDIO_PLAYBACK_BACKEND_TYPE_PIPEWIRE:
+   case SM_AUDIO_PLAYBACK_BACKEND_API_PIPEWIRE:
       // this->backend.pipewire = sm_audio_playback_backend_pipewire_create(create_info);
       break;
    }
@@ -39,10 +39,10 @@ SM_Audio_Playback *sm_audio_playback_create(const SM_Audio_Playback_Create_Info 
 void sm_audio_playback_destroy(SM_Audio_Playback *this)
 {
    switch (this->backend_type) {
-   case SM_AUDIO_PLAYBACK_BACKEND_TYPE_PULSEAUDIO:
+   case SM_AUDIO_PLAYBACK_BACKEND_API_PULSEAUDIO:
       sm_audio_playback_backend_pulseaudio_destroy(this->backend.pulseaudio);
       break;
-   case SM_AUDIO_PLAYBACK_BACKEND_TYPE_PIPEWIRE:
+   case SM_AUDIO_PLAYBACK_BACKEND_API_PIPEWIRE:
       break;
    }
 

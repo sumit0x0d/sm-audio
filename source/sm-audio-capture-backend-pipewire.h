@@ -23,6 +23,7 @@ typedef struct {
 } SM_Audio_Capture_Backend_PipeWire;
 
 SM_Audio_Capture_Backend_PipeWire *sm_audio_capture_backend_pipewire_create(const SM_Audio_Capture_Create_Info *create_info);
+
 void sm_audio_capture_backend_pipewire_destroy(SM_Audio_Capture_Backend_PipeWire *this);
 
 #endif

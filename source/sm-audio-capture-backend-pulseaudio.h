@@ -12,6 +12,7 @@ typedef struct {
 } SM_Audio_Capture_Backend_PulseAudio;
 
 SM_Audio_Capture_Backend_PulseAudio *sm_audio_capture_backend_pulseaudio_create(const SM_Audio_Capture_Create_Info *create_info);
+
 void sm_audio_capture_backend_pulseaudio_destroy(SM_Audio_Capture_Backend_PulseAudio *this);
 
 #endif

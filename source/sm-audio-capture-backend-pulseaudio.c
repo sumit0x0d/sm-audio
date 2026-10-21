@@ -9,18 +9,22 @@ static void _pa_stream_event_cb(pa_stream *pstream, const char *name, pa_proplis
 
 SM_Audio_Capture_Backend_PulseAudio *sm_audio_capture_backend_pulseaudio_create(const SM_Audio_Capture_Create_Info *create_info)
 {
-   SM_Audio_Capture_Backend_PulseAudio *pulseaudio = (SM_Audio_Capture_Backend_PulseAudio *)malloc(sizeof (SM_Audio_Capture_Backend_PulseAudio));
-   pa_error_code_t result = PA_OK;
+   SM_Audio_Capture_Backend_PulseAudio *pulseaudio;
+   pa_error_code_t result;
+   pa_mainloop_api *pa_mainloop_api;
+
+   pulseaudio = (SM_Audio_Capture_Backend_PulseAudio *)malloc(sizeof (SM_Audio_Capture_Backend_PulseAudio));
+   result = PA_OK;
    pulseaudio->pa_mainloop = pa_mainloop_new();
-   pa_mainloop_api *pa_mainloop_api = pa_mainloop_get_api(pulseaudio->pa_mainloop);
-   pulseaudio->pa_context = pa_context_new(pa_mainloop_api, "audio-capture-pulseaudio");
+   pa_mainloop_api = pa_mainloop_get_api(pulseaudio->pa_mainloop);
+   pulseaudio->pa_context = pa_context_new(pa_mainloop_api, "audio-capture-backend-pulseaudio");
    const pa_sample_spec pa_sample_spec = {
      // .format = create_config->pa_sample_format,
      .rate = create_info->sample_rate,
      .channels = create_info->channel_count
    };
    pa_context_connect(pulseaudio->pa_context, NULL, PA_CONTEXT_NOFLAGS, NULL);
-   pulseaudio->pa_stream = pa_stream_new(pulseaudio->pa_context, "audio-capture", &pa_sample_spec, NULL);
+   pulseaudio->pa_stream = pa_stream_new(pulseaudio->pa_context, "audio-capture-backend-pulseaudio", &pa_sample_spec, NULL);
    pa_stream_set_state_callback(pulseaudio->pa_stream, _pa_stream_notify_cb, NULL);
    result = pa_stream_connect_record(pulseaudio->pa_stream, NULL, NULL, PA_STREAM_NOFLAGS);
    if(result) {
@@ -44,6 +48,7 @@ void sm_audio_capture_backend_pulseaudio_destroy(SM_Audio_Capture_Backend_PulseA
 static void _pa_stream_success_cb(pa_stream *s, int success, void *userdata)
 {
    SM_Audio_Capture_Backend_PulseAudio *p = userdata;
+   
    if (success < 0) {
       fprintf(stderr, "Stream connection failed: %s\n", pa_strerror(success));
       // pa_mainloop_quit(p, 1);
