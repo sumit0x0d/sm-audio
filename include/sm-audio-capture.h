@@ -18,13 +18,13 @@ typedef struct {
    SM_Unsigned_8 channel_count;
    SM_Unsigned_32 sample_rate;
 } SM_Audio_Capture_Create_Info;
-   
+
 typedef struct {
 
 } SM_Audio_Capture_Device;
 
 typedef struct {
-   SM_Audio_Capture_Device *device;
+   SM_Audio_Capture_Device **device;
    size_t device_count;
 } SM_Audio_Capture_Device_List;
 
@@ -34,7 +34,7 @@ SM_API void sm_audio_capture_destroy(SM_Audio_Capture *this);
 
 SM_API SM_Audio_Capture_Device_List *sm_audio_capture_get_device_list(SM_Audio_Capture *this);
 
-SM_API SM_Audio_Capture_Device *sm_audio_capture_get_device(SM_Audio_Capture *this, size_t index);
+SM_API void sm_audio_capture_set_device(SM_Audio_Capture *this, SM_Audio_Capture_Device *device);
 
 SM_API void sm_audio_capture_start(SM_Audio_Capture *this);
 

@@ -1,1 +1,1 @@
-# SM Audio (libsm-x)
+# [libsm-x] Audio
