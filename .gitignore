@@ -2,7 +2,7 @@
 !include/
 !source/
 !test/
-!CMakeLists.txt
-!README.md
-!LICENSE
 !.gitignore
+!CMakeLists.txt
+!LICENSE
+!README.md
